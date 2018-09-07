@@ -5,8 +5,7 @@ from class_defining_edge_series import EdgeSeriesAndSequenceBlocks
 
 class RouteIdentification:
 
-    route = []
-    Paths = []
+
     is_last_operation = 0
 
     def __init__(self):
@@ -15,7 +14,7 @@ class RouteIdentification:
     def __del__(self):
         pass
 
-    def Identify_Routes(self, sequence_blocks):
+    def Identify_Routes(self, sequence_blocks, route, Paths, level, level_1_counter):
 
 
         generate_the_series_of_edges = EdgeSeriesAndSequenceBlocks()
@@ -23,32 +22,45 @@ class RouteIdentification:
 
         find_rearrangement_operations = RearrangementOperationIdentification()
         Inversions = find_rearrangement_operations.InversionIdentification(edge_series)
-        Translocations = find_rearrangement_operations.TranslocationIdentification(edge_series, sequence_blocks)
+        Raw_Translocations = find_rearrangement_operations.TranslocationIdentification(edge_series, sequence_blocks)
+        Translocations = find_rearrangement_operations.remove_equivalent_operations(Raw_Translocations)
+
         Inverted_translocations = find_rearrangement_operations.InvertedTranslocationIdentification(edge_series,
                                                                                                     sequence_blocks)
+
+
+
         Operations = []
         Operations.extend(Inversions)
         Operations.extend(Translocations)
         Operations.extend(Inverted_translocations)
 
-        print()
-        print('OPERATIONS:   ', Operations)
-        print()
 
-        excecute = RouteIdentification()
+        if level == 1:
+            Operations.append('Catch_all')
+
+
+        find_routes = RouteIdentification()
+
 
         if len(Operations) == 0:
-            print('FINAL ROUTE:   ', RouteIdentification.route)
 
-            RouteIdentification.Paths.append(RouteIdentification.route)
+            Paths.append(route[:])
 
-            RouteIdentification.route.pop()
+            route.pop()
+            level -= 1
+
             if RouteIdentification.is_last_operation == 'yes':
-                RouteIdentification.route.pop()
+                route.pop()
+                level -=1
+
+
 
             pass
 
         else:
+            level += 1
+
 
             for i in range(len(Operations)):
                 if i < len(Operations)-1:
@@ -56,14 +68,24 @@ class RouteIdentification:
                 else:
                     RouteIdentification.is_last_operation = 'yes'
 
+
+
                 current_opperation = Operations[i]
 
-                new_sequence_blocks = excecute.Excecute_Opperations(current_opperation, Inversions, Translocations, Inverted_translocations, sequence_blocks)
+                if current_opperation == 'Catch_all':
 
-                excecute.Identify_Routes(new_sequence_blocks)
+                    route.clear()
+                    pass
 
+                else:
+                    excecute = find_routes.Excecute_Opperations(current_opperation, Inversions, Translocations, Inverted_translocations, sequence_blocks)
 
+                    new_sequence_blocks = excecute[0]
+                    route.append(excecute[1])
 
+                    find_routes.Identify_Routes(new_sequence_blocks, route, Paths, level, level_1_counter)
+
+        return Paths
 
 
 
@@ -101,11 +123,5 @@ class RouteIdentification:
 
 
 
-        RouteIdentification.route.append(operation)
 
-        print()
-        print('WORKING ROUTE:   ', RouteIdentification.route)
-        print()
-
-
-        return new_sequence_blocks
+        return (new_sequence_blocks, operation)

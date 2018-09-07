@@ -11,10 +11,13 @@ class EdgeSeriesAndSequenceBlocks:
     #DEF: use the tab delimited input file to generate a list of sequence blocks
     def ListSequenceBlocks(self, filename):
         names_and_positions_of_sequence_blocks = np.loadtxt(filename, delimiter='\t', unpack=True, dtype=object)
-        sequence_block_names = names_and_positions_of_sequence_blocks[0, :]
+        sequence_block_names = names_and_positions_of_sequence_blocks[0,:]
+        sequence_block_positions = names_and_positions_of_sequence_blocks[1,:]
         sequence_blocks = []
+        block_positions = []
         for i in range(0, len(sequence_block_names)):
             sequence_blocks.append(int(sequence_block_names[i]))
+            block_positions.append(tuple(sequence_block_positions[i]))
 
         return sequence_blocks
 

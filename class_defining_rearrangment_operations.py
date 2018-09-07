@@ -12,6 +12,7 @@ class RearrangementOperationIdentification():
         edge_series.extend(working_edge_series)
         Inversion_operations = []
 
+
         # 1. iterate through the list of edge pairs.
         # 2. calculate the possible inversion partners for the current edge pair.
         # 3. determine whether an inversion partner is present in the list of edge pairs.
@@ -62,6 +63,7 @@ class RearrangementOperationIdentification():
 
     def TranslocationIdentification(self, edge_series, sequence_blocks):
         Translocation_operations = []
+        adjacent_translocations = []
 
         # 1. iterate through the list of edge pairs.
         # 2. for each edge calculate the compatible sequence block for the occurance of a translocation
@@ -113,6 +115,8 @@ class RearrangementOperationIdentification():
             else:
                 pass
 
+
+
         return Translocation_operations
 
     def InvertedTranslocationIdentification(self, edge_series, sequence_blocks):
@@ -129,6 +133,9 @@ class RearrangementOperationIdentification():
             edge2 = current_edge_pair[1]
             orientation_edge1 = edge1 / abs(edge1)
             orientation_edge2 = edge2 / abs(edge2)
+
+
+            
 
 
             #Calculation of the compatible sequence block
@@ -155,6 +162,11 @@ class RearrangementOperationIdentification():
 
                 if position_block1 < position_block2 and position_edge1 not in range(position_block1, position_block2):
                     Inverted_Translocation_operations.append((current_edge_pair, compatible_sequence_block))
+
+
+                elif position_block1 == position_block2:
+                    Inverted_Translocation_operations.append((current_edge_pair, compatible_sequence_block))
+                                                             
                 else:
                     pass
             else:
@@ -162,3 +174,45 @@ class RearrangementOperationIdentification():
 
 
         return Inverted_Translocation_operations
+
+
+    def test_for_adjacency(self, Translocations):
+
+        adjacent_translocations = []
+        Translocation_operations = []
+        for i in range(len(Translocations)):
+            current_operation = Translocations[i]
+            for j in range(len(Translocations)):
+                other_operation = Translocations[j]
+                if current_operation[0][1] == other_operation[1][0] and current_operation[1][1] == other_operation[0][
+                    0]:
+                    adjacent_translocations.append((current_operation, other_operation))
+
+
+                else:
+                    pass
+
+        Translocation_operations = Translocations
+        for i in range(len(adjacent_translocations) - 1):
+
+            to_remove = adjacent_translocations[i][1]
+            print('to remove   ', to_remove)
+            Translocation_operations.remove(to_remove)
+            print('removed  ', Translocation_operations)
+
+        adjacent_translocations.clear()
+        return Translocation_operations
+
+    def remove_equivalent_operations(self, Translocations):
+        list_of_translocations = []
+        list_of_translocations.extend(Translocations)
+        for i in range(len(Translocations)):
+            current_translocation = Translocations[i]
+            for j in range(len(Translocations)):
+                other_translocation = Translocations[j]
+                if current_translocation[0][1] == other_translocation[1][0] and current_translocation[1][1]==other_translocation[0][0]:
+                    list_of_translocations.remove(other_translocation)
+                else:
+                    pass
+
+        return list_of_translocations
