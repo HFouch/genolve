@@ -176,32 +176,6 @@ class RearrangementOperationIdentification():
         return Inverted_Translocation_operations
 
 
-    def test_for_adjacency(self, Translocations):
-
-        adjacent_translocations = []
-        Translocation_operations = []
-        for i in range(len(Translocations)):
-            current_operation = Translocations[i]
-            for j in range(len(Translocations)):
-                other_operation = Translocations[j]
-                if current_operation[0][1] == other_operation[1][0] and current_operation[1][1] == other_operation[0][
-                    0]:
-                    adjacent_translocations.append((current_operation, other_operation))
-
-
-                else:
-                    pass
-
-        Translocation_operations = Translocations
-        for i in range(len(adjacent_translocations) - 1):
-
-            to_remove = adjacent_translocations[i][1]
-            print('to remove   ', to_remove)
-            Translocation_operations.remove(to_remove)
-            print('removed  ', Translocation_operations)
-
-        adjacent_translocations.clear()
-        return Translocation_operations
 
     def remove_equivalent_operations(self, Translocations):
         list_of_translocations = []
