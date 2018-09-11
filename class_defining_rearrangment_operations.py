@@ -175,18 +175,29 @@ class RearrangementOperationIdentification():
 
         return Inverted_Translocation_operations
 
-
-
-    def remove_equivalent_operations(self, Translocations):
+    def remove_equivalent_operations(self, Translocations, sequence_blocks):
         list_of_translocations = []
         list_of_translocations.extend(Translocations)
-        for i in range(len(Translocations)):
+
+        i =0
+        while i < len(Translocations):
             current_translocation = Translocations[i]
-            for j in range(len(Translocations)):
+
+            j = 0
+            while j < len(Translocations):
                 other_translocation = Translocations[j]
-                if current_translocation[0][1] == other_translocation[1][0] and current_translocation[1][1]==other_translocation[0][0]:
-                    list_of_translocations.remove(other_translocation)
+
+                if sequence_blocks.index(current_translocation[1][1]) == sequence_blocks.index(
+                    other_translocation[1][0]) - 1 :
+                    Translocations.remove(other_translocation)
+
                 else:
                     pass
+                j += 1
+            i += 1
 
-        return list_of_translocations
+
+        return Translocations
+
+
+
