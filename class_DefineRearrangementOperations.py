@@ -1,4 +1,5 @@
 from class_RearrangementOperationExecution import RearrangementOperationExecution
+from class_SequenceBlockAndEdgeSeriesIdentification import SequenceBlockAndEdgeSeriesIdentification
 
 
 class DefineRearrangementOperations:
@@ -238,6 +239,132 @@ class DefineRearrangementOperations:
             inversion_position = invert[1]
             operation = ('INV', inversion, inversion_position)
         return (sequence_blocks, operation, i)
+
+
+    def final_translocation_search(self, sequence_blocks, blocks, list_of_final_translocations):
+
+        generate_the_series_of_edges = SequenceBlockAndEdgeSeriesIdentification()
+        find_translocations = DefineRearrangementOperations()
+        edge_series = generate_the_series_of_edges.generate_edge_series(sequence_blocks)
+
+
+
+        if len(edge_series) == 0:
+
+            return sequence_blocks, list_of_final_translocations
+
+
+        while len(edge_series) != 0:
+            new_translocations = []
+
+            while len(new_translocations) == 0:
+
+                i = 0
+
+                while i < len(edge_series):
+
+                    current_edge = edge_series[i]
+                    search_for_translocations = find_translocations.translocation_search(current_edge, sequence_blocks,
+                                                                                         blocks)
+
+                    new_sequence_blocks = search_for_translocations[0]
+                    blocks = search_for_translocations[1]
+                    new_translocations = search_for_translocations[2]
+
+                    if len(new_translocations) == 0:
+                        i += 1
+
+                    else:
+                        list_of_final_translocations.append(new_translocations)
+                        sequence_blocks = new_sequence_blocks
+                        edge_series = generate_the_series_of_edges.generate_edge_series(sequence_blocks)
+
+
+                        return find_translocations.final_translocation_search(sequence_blocks, blocks,
+                                                                       list_of_final_translocations)
+
+                else:
+
+                    block_removal = find_translocations.perform_block_removal(edge_series, sequence_blocks, blocks)
+                    edge_series = block_removal[0]
+                    sequence_blocks = block_removal[1]
+                    blocks = block_removal[2]
+
+                    return find_translocations.final_translocation_search( sequence_blocks, blocks,
+                                                                   list_of_final_translocations)
+
+
+    def translocation_search(self, current_edge_pair, sequence_blocks, blocks):
+
+        execute_translocation = RearrangementOperationExecution()
+        identified_translocation = []
+        blocks_list = []
+        for i in range(len(blocks)):
+            blocks_list.append((blocks[i][0], blocks[i][-1]))
+
+        i = 0
+
+        edge1 = current_edge_pair[0]
+        edge2 = current_edge_pair[1]
+
+        compatible_sequence_block_1 = (abs(edge1) + 1)
+        compatible_sequence_block_2 = (abs(edge2) - 1)
+
+        compatible_sequence_block = (int(compatible_sequence_block_1), int(compatible_sequence_block_2))
+
+
+        if compatible_sequence_block[0] in sequence_blocks and compatible_sequence_block[1] in sequence_blocks:
+            position_block1 = sequence_blocks.index(compatible_sequence_block[0])
+            position_block2 = sequence_blocks.index(compatible_sequence_block[1])
+            position_edge1 = sequence_blocks.index(edge1)
+
+            if position_block1 < position_block2 and position_edge1 not in range(position_block1,
+                                                                                 position_block2):
+                translocation = (current_edge_pair, compatible_sequence_block)
+                add_to_list = ('TRN', current_edge_pair, compatible_sequence_block)
+                identified_translocation.append(add_to_list)
+                execute = execute_translocation.excecute_translocation(translocation, sequence_blocks)
+                sequence_blocks = execute[0]
+
+
+
+            elif position_block1 == position_block2:
+
+                translocation = (current_edge_pair, compatible_sequence_block)
+                add_to_list = ('TRN', current_edge_pair, compatible_sequence_block)
+                identified_translocation.append(add_to_list)
+                execute = execute_translocation.excecute_translocation(translocation, sequence_blocks)
+                sequence_blocks = execute[0]
+
+
+
+        elif compatible_sequence_block in blocks_list:
+            block_position = blocks_list.index(compatible_sequence_block)
+
+            new_sequence_blocks = sequence_blocks[:sequence_blocks.index(current_edge_pair[0]) + 1] + blocks[
+                block_position] + sequence_blocks[sequence_blocks.index(current_edge_pair[0]) + 1:]
+            sequence_blocks = new_sequence_blocks
+
+            add_to_list = ('TRN', current_edge_pair, (blocks[i][0], blocks[i][-1]))
+            identified_translocation.append(add_to_list)
+            blocks.remove(blocks[i])
+
+        return sequence_blocks, blocks, identified_translocation
+
+
+    def perform_block_removal(self, edge_series, sequence_blocks, blocks):
+
+        block_to_remove = sequence_blocks[
+                          sequence_blocks.index(edge_series[0][1]):sequence_blocks.index(edge_series[1][0]) + 1]
+
+        blocks.append(block_to_remove)
+        for i in range(len(block_to_remove)):
+            sequence_blocks.remove(block_to_remove[i])
+
+        generate_the_series_of_edges = SequenceBlockAndEdgeSeriesIdentification()
+        edge_series = generate_the_series_of_edges.generate_edge_series(sequence_blocks)
+
+        return edge_series, sequence_blocks, blocks
 
 
 

@@ -12,8 +12,8 @@ rec_limit = sys.getrecursionlimit()
 
 if __name__ == '__main__':
 
-     filenameB = 'genomeB.txt'
-     filenameA = 'genomeA.txt'
+     filenameB = 'genomeB_N.txt'
+     filenameA = 'genomeA_N.txt'
 
      generate_list_of_sequence_blocks = SequenceBlockAndEdgeSeriesIdentification()
      sequence_blocks_B = generate_list_of_sequence_blocks.list_sequence_blocks(filenameB)
@@ -59,8 +59,10 @@ if __name__ == '__main__':
      for i in range(len(Sets_of_operations)):
           if 'FINAL_INVERSIONS' in Sets_of_operations[i]:
                Sets_of_operations[i].remove('FINAL_INVERSIONS')
+          if 'FINAL_TRANSLOCATIONS' in Sets_of_operations[i]:
+               Sets_of_operations[i].remove('FINAL_TRANSLOCATIONS')
           print(Sets_of_operations[i])
-          print()
+          #print()
           #current = Sets_of_operations[i]
           #if len(current) < len(shortest):
            #    shortest = current
@@ -70,3 +72,4 @@ if __name__ == '__main__':
 
      #print(shortest)
      #print(len(shortest))
+     print('Number of paths:  ' , len(Paths))
